@@ -2,27 +2,28 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
+
+	"lenslocked/views"
 
 	"github.com/gorilla/mux"
 )
 
 var (
-	homeTemplate 			*template.Template
-	contactTemplate		*template.Template
+	homeView 			views.View
+	contactView		views.View
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := homeTemplate.Execute(w, nil); err != nil {
+	if err := homeView.Template.ExecuteTemplate(w, homeView.Layout, nil); err != nil {
 		panic(err)
 	}
 }
 
 func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := contactTemplate.Execute(w, nil); err != nil {
+	if err := contactView.Template.ExecuteTemplate(w, contactView.Layout, nil); err != nil {
 		panic(err)
 	}
 }
@@ -38,16 +39,8 @@ func err404(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	var err error
-	homeTemplate, err = template.ParseFiles("views/home.gohtml", "views/layouts/footer.gohtml")
-	if err != nil {
-		panic(err)
-	}
-	contactTemplate, err = template.ParseFiles("views/contact.gohtml", "views/layouts/footer.gohtml")
-	if err != nil {
-		panic(err)
-	}
-
+	homeView = *views.NewView("bootstrap", "views/home.gohtml")
+	contactView = *views.NewView("bootstrap", "views/contact.gohtml")
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
 	r.HandleFunc("/contact", contact)
