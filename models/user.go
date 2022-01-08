@@ -14,6 +14,8 @@ var (
 	ErrInvalidID = errors.New("models: ID provided was invalid")
 )
 
+const userPwdPepper = "satoshi-nakamoto"
+
 // NewUserService creates the singleton of the user service
 func NewUserService(connectionInfo string) (*UserService) {
 	db, err := gorm.Open("postgres", connectionInfo)
@@ -65,7 +67,8 @@ func first(db *gorm.DB, dest interface{}) error {
 
 //Create creates a user off the provided data
 func (us *UserService) Create(user *User) error {
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	pwdBytes := []byte(user.Password + userPwdPepper)
+	hashedBytes, err := bcrypt.GenerateFromPassword(pwdBytes, bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
