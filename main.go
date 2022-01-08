@@ -32,6 +32,7 @@ func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	us := models.NewUserService(psqlInfo)
 	defer us.Close()
+	//us.DestructiveReset()
 	us.AutoMigrate()
 
 	staticC := *controllers.NewStatic()
@@ -44,6 +45,7 @@ func main() {
 	r.HandleFunc("/signup", usersC.New).Methods("GET")
 	r.HandleFunc("/signup", usersC.Create).Methods("POST")
 
+	fmt.Println("Starting server on port 3000...")
 	http.ListenAndServe(":3000", r)
 }
 
