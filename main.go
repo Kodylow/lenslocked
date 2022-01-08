@@ -32,7 +32,7 @@ func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	us := models.NewUserService(psqlInfo)
 	defer us.Close()
-	//us.DestructiveReset()
+	us.DestructiveReset()
 	us.AutoMigrate()
 
 	staticC := *controllers.NewStatic()
