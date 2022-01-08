@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"lenslocked/models"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
@@ -15,32 +15,24 @@ const (
 	dbname = "localdb"
 )
 
-type User struct {
-	gorm.Model
-	Name 	string
-	Email	string `gorm:"not null;unique-index"`
-	Color	string
-}
-
 func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 	
-	db, err := gorm.Open("postgres", psqlInfo)
+	us := models.NewUserService(psqlInfo)
+	defer us.Close()
+	// us.DestructiveReset()
+	// user := models.User {
+	// 	Name:	"Michael Scott",
+	// 	Email: "michael@scott.com",
+	// }
+	// if err := us.Create(&user); err != nil {
+	// 	panic(err)
+	// }
+	user, err := us.ByID(1)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-
-	db.LogMode(true)
-	db.AutoMigrate(&User{})
-
-	var u User = User{
-		Color: "red",
-		Email: "kody@me.com",
-	}
-
-	db.Where(u).First(&u)
-	fmt.Println(u)
+	fmt.Println(user)
 }
 
 
@@ -89,3 +81,10 @@ func main() {
 // 			panic(err)
 // 		}
 // 	// }
+
+// type User struct {
+// 	gorm.Model
+// 	Name 	string
+// 	Email	string `gorm:"not null;unique-index"`
+// 	Color	string
+// }
