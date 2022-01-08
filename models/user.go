@@ -92,6 +92,13 @@ func (us *UserService) DestructiveReset() {
 	us.db.AutoMigrate(&User{})
 }
 
+func (us *UserService) AutoMigrate() error {
+	if err := us.db.AutoMigrate(&User{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 type User struct {
 	gorm.Model
 	Name	string

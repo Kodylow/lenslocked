@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"lenslocked/controllers"
+	"lenslocked/models"
 
 	"github.com/gorilla/mux"
 )
@@ -18,10 +19,23 @@ func err404(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<h1>We could not find the page you were looking for</p>")
 }
 
-func main() {
-	staticC := *controllers.NewStatic()
+const (
+	host = "localhost"
+	port = 5432
+	user = "postgres"
+	password = "thing"
+	dbname = "localdb"
+)
 
-	usersC := *controllers.NewUsers()
+func main() {
+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	us := models.NewUserService(psqlInfo)
+	defer us.Close()
+	us.AutoMigrate()
+
+	staticC := *controllers.NewStatic()
+	usersC := *controllers.NewUsers(us)
 
 	r := mux.NewRouter()
 
