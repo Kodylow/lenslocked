@@ -12,6 +12,7 @@ import (
 var (
 	ErrNotFound = errors.New("models: resources not found")
 	ErrInvalidID = errors.New("models: ID provided was invalid")
+	ErrInvalidPW = errors.New("models: incorrect password provided")
 )
 
 const userPwdPepper = "satoshi-nakamoto"
@@ -48,6 +49,26 @@ func (us *UserService) ByEmail(email string) (*User, error) {
 	db := us.db.Where("email = ?", email)
 	err := first(db, &user)
 	return &user, err
+}
+
+//Autthenticate auths a user with nput email and password
+func (us *UserService) Authenticate(email, password string) (*User, error) {
+	foundUser, err := us.ByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password + userPwdPepper))
+	if err != nil {
+		switch err {
+		case bcrypt.ErrMismatchedHashAndPassword:
+			return nil, ErrInvalidPW
+		default:
+			return nil, err
+		}
+	}
+
+	return foundUser, nil
 }
 
 //first queries using the provided gorm.db

@@ -42,10 +42,10 @@ func main() {
 
 	r.Handle("/", staticC.Home).Methods("GET")
 	r.Handle("/contact", staticC.Contact).Methods("GET")
-	r.Handle("/login", usersC.NewView).Methods("GET")
-	r.HandleFunc("/login", usersC.Create).Methods("POST")
-	r.Handle("/signup", usersC.LoginView).Methods("GET")
-	r.HandleFunc("/signup", usersC.Login).Methods("POST")
+	r.Handle("/signup", usersC.NewView).Methods("GET")
+	r.HandleFunc("/signup", usersC.Create).Methods("POST")
+	r.Handle("/login", usersC.LoginView).Methods("GET")
+	r.HandleFunc("/login", usersC.Login).Methods("POST")
 
 	fmt.Println("Starting server on port 3000...")
 	http.ListenAndServe(":3000", r)
