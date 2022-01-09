@@ -75,14 +75,30 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := u.us.Authenticate(form.Email, form.Password)
-	switch err {
-	case models.ErrNotFound:
-		fmt.Fprintln(w, "Invalid email address.")
-	case models.ErrInvalidPW:
-		fmt.Fprintln(w, "Invalid password provided.")
-	case nil:
-		fmt.Fprintln(w, user)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err != nil {
+		switch err {
+		case models.ErrNotFound:
+			fmt.Fprintln(w, "Invalid email address.")
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
+	fmt.Println("User", user.Email)
+	cookie := http.Cookie{
+		Name: "email",
+		Value: user.Email,
+	}
+
+	http.SetCookie(w, &cookie)
+}
+
+//CookieTest displays cookies set on current user
+func (u *Users) CookieTest(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("email")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("In here")
+	fmt.Fprintln(w, "Email is: ", cookie.Value)
 }

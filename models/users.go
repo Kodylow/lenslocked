@@ -67,7 +67,6 @@ func (us *UserService) Authenticate(email, password string) (*User, error) {
 			return nil, err
 		}
 	}
-
 	return foundUser, nil
 }
 
